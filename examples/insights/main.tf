@@ -1,25 +1,34 @@
 module "naming" {
-  source  = "cloudnationhq/naming/azure"
-  version = "~> 0.32"
+  source  = "codectl/naming/azure"
+  version = "~> 0.1"
 
   suffix = ["demo", "dev"]
 }
 
+module "regions" {
+  source  = "codectl/locations/azure"
+  version = "~> 1.0"
+
+  location = {
+    primary = "westeurope"
+  }
+}
+
 module "rg" {
-  source  = "cloudnationhq/rg/azure"
-  version = "~> 3.0"
+  source  = "codectl/rg/azure"
+  version = "~> 1.0"
 
   groups = {
     demo = {
       name     = module.naming.resource_group.name_unique
-      location = "westeurope"
+      location = module.regions.location.primary.name
     }
   }
 }
 
 module "analytics" {
-  source  = "cloudnationhq/law/azure"
-  version = "~> 4.0"
+  source  = "codectl/law/azure"
+  version = "~> 1.0"
 
   workspace = {
     name                = module.naming.log_analytics_workspace.name_unique
@@ -29,8 +38,8 @@ module "analytics" {
 }
 
 module "fw_policy" {
-  source  = "cloudnationhq/fwp/azure"
-  version = "~> 5.0"
+  source  = "codectl/fwp/azure"
+  version = "~> 1.0"
 
   firewall_policy = {
     name                = module.naming.firewall_policy.name
